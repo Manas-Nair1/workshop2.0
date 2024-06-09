@@ -2,51 +2,80 @@ import React, { useState } from 'react'; // Import React and useState hook
 import axios from 'axios'; // Import axios for making API requests
 
 const Home = () => {
-  let [genre, setGenre] = useState(""); // State to store the selected genre
-  let [deck, setDeck] = useState([]); // State to store the deck of movie cards
-  let [genreOptions, setGenreOptions] = useState([]); // State to store genre options for the dropdown
+  // State to store the user input genre
+  let [genreInput, setGenreInput] = useState(""); 
+  // State to store the selected genre from the dropdown
+  let [selectedGenre, setSelectedGenre] = useState(""); 
+  // State to store the list of movie cards
+  let [movieCards, setMovieCards] = useState([]); 
+  // State to store genre options for the dropdown
+  let [dropdownOptions, setDropdownOptions] = useState([]); 
+  // State to store any error message
+  let [errorMessage, setErrorMessage] = useState(""); 
 
   // Function to handle changes in the genre input field
-  const handleGenreChange = async (event) => {
-    setGenre(event.target.value); // Update the genre state with the value entered by the user
-    // Fetch genre options from TMDB API based on the user input
-    let genre_id = await axios.get(`https://api.themoviedb.org/3/search/keyword?api_key=bb76d810eac6dda796c6389702e136b2&query=${genre}`);
-    let options = genre_id.data.results.map(result => result.name); // Extract genre names from the API response
-    setGenreOptions(options); // Update the genre options state
+  const handleGenreInputChange = async (event) => {
+    setGenreInput(event.target.value); // Update the genreInput state with the value entered by the user
+
+    try {
+      // Fetch genre options from TMDB API based on the user input
+      let response = await axios.get(`https://api.themoviedb.org/3/search/keyword?api_key=bb76d810eac6dda796c6389702e136b2&query=${event.target.value}`);
+      let options = response.data.results.map(result => result.name); // Extract genre names from the API response
+      setDropdownOptions(options); // Update the dropdownOptions state
+    } catch (err) {
+      setErrorMessage("Error fetching genre options"); // Set error message if the API request fails
+    }
   };
 
   // Function to create movie cards based on the selected genre
-  const createCard = async (event) => {
-    setGenre(event.target.value);
-    if (!genre) return; // If no genre is selected, exit the function
-    // Fetch movies from TMDB API based on the selected genre
-    console.log(genre)
-    let tempDeck = [];
-    let genre_id = await axios.get(`https://api.themoviedb.org/3/search/keyword?api_key=bb76d810eac6dda796c6389702e136b2&query=${genre}`);
-    console.log(genre_id)
-    let movies = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=bb76d810eac6dda796c6389702e136b2&language=en-US&sort_by=popularity.desc&page=1&with_keywords=${genre_id.data.results[0].id}`);
-    
-    // Loop to create 5 different movie cards
-    for (let i = 0; i < 5; i++) {
-      // Extract movie details from the API response
-      let title = movies.data.results[i].title;
-      let image = `https://image.tmdb.org/t/p/w500${movies.data.results[i].poster_path}`;
-      let overview = movies.data.results[i].overview;
-      let voter_average = movies.data.results[i].vote_average;
-      let release_date = movies.data.results[i].release_date;
+  const createMovieCards = async (selectedGenre) => {
+    setSelectedGenre(selectedGenre); // Update the selectedGenre state
+    if (!selectedGenre) return; // If no genre is selected, exit the function
+    setErrorMessage(""); // Reset any previous error messages
 
-      // Add movie details to the temporary deck
-      tempDeck.push({
-        title: title,
-        image: image,
-        overview: overview,
-        voter_average: voter_average,
-        release_date: release_date
-      });
+    try {
+      // Fetch genre ID from TMDB API based on the selected genre
+      let genreResponse = await axios.get(`https://api.themoviedb.org/3/search/keyword?api_key=bb76d810eac6dda796c6389702e136b2&query=${selectedGenre}`);
+      let genreId = genreResponse.data.results[0].id;
+
+      // Fetch movies from TMDB API based on the genre ID
+      let moviesResponse = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=bb76d810eac6dda796c6389702e136b2&language=en-US&sort_by=popularity.desc&page=1&with_keywords=${genreId}`);
+      
+      // Create an array to store the movie cards
+      let tempMovieCards = [];
+      // Loop to create 5 different movie cards
+      for (let i = 0; i < 5; i++) {
+        let movie = moviesResponse.data.results[i];
+        if (!movie) throw new Error("Movie data is undefined"); // Throw an error if movie data is undefined
+        
+        // Extract movie details from the API response
+        let title = movie.title;
+        let image = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+        let overview = movie.overview;
+        let voterAverage = movie.vote_average;
+        let releaseDate = movie.release_date;
+
+        // Add movie details to the temporary array
+        tempMovieCards.push({
+          title: title,
+          image: image,
+          overview: overview,
+          voterAverage: voterAverage,
+          releaseDate: releaseDate
+        });
+      }
+
+      // Update the movieCards state with the temporary array
+      setMovieCards(tempMovieCards);
+    } catch (err) {
+      setErrorMessage("Error fetching movie data"); // Set error message if the API request fails
+      setMovieCards([]); // Clear movie cards if there's an error
     }
-    
-    // Update the deck state with the temporary deck
-    setDeck(tempDeck);
+  };
+
+  // Wrapper function to pass selected value to createMovieCards
+  const handleSelectChange = (event) => {
+    createMovieCards(event.target.value);
   };
 
   return (
@@ -55,32 +84,35 @@ const Home = () => {
       <input
         type="text"
         placeholder="Enter genre"
-        value={genre}
-        onChange={handleGenreChange} // Call handleGenreChange function when the value changes
+        value={genreInput}
+        onChange={handleGenreInputChange} // Call handleGenreInputChange function when the value changes
       />
       
       {/* Dropdown menu for selecting genre */}
-      <h2>Which type of {genre} would you like?</h2>
-      <select value={genre} onChange={createCard}> {/* Call createCard function when a genre is selected */}
-        {genreOptions.map(option => (
+      <h2>Which type of {genreInput} would you like?</h2>
+      <select value={selectedGenre} onChange={handleSelectChange}> {/* Call handleSelectChange function when a genre is selected */}
+        {dropdownOptions.map(option => (
           <option key={option} value={option}>{option}</option> // Render options dynamically based on available genre options
         ))}
       </select>
 
+      {/* Display error message if any */}
+      {errorMessage && <div className="error">{errorMessage}</div>}
+
       {/* Container to display movie cards */}
       <div className="container">
-        {deck.map((tempDeck, index) => ( // Loop through the deck and render movie cards
+        {movieCards.map((movie, index) => ( // Loop through the movieCards and render movie cards
           <div key={index} className="card">
             <div className="rectangle">
               <div className="square">
-                <img src={tempDeck.image} alt={tempDeck.title} /> {/* Display movie poster */}
+                <img src={movie.image} alt={movie.title} /> {/* Display movie poster */}
               </div>
             </div>
             <div className="details">
-              <h2>{tempDeck.title}</h2> {/* Display movie title */}
-              <p>{tempDeck.release_date}</p> {/* Display movie release date */}
-              <p>{tempDeck.overview}</p> {/* Display movie overview */}
-              <p>{tempDeck.voter_average}</p> {/* Display movie voter average */}
+              <h2>{movie.title}</h2> {/* Display movie title */}
+              <p>{movie.releaseDate}</p> {/* Display movie release date */}
+              <p>{movie.overview}</p> {/* Display movie overview */}
+              <p>{movie.voterAverage}</p> {/* Display movie voter average */}
             </div>
           </div>
         ))}
