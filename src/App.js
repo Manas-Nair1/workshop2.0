@@ -1,7 +1,30 @@
-import React, { useState } from 'react'; // Import React and useState hook
-import axios from 'axios'; // Import axios for making API requests
+/*
+import packages are when you want to access libraries or functions that you don't want to write yourself. These can be found within the 
+package-lock.json.
+
+The syntax is:
+
+import FUNCTION, {FUNCTION} from NODE PACKAGE;
+
+*/
+
+import React, { useState } from 'react'; 
+import axios from 'axios'; 
 
 const Home = () => {
+  /*These are where the useState variables will go. These usually come in last so that you know which elements you need to store. 
+  They store information dynamically (the information can change) and you can access or call them whenever. The syntax goes either:
+  let [VARIABLE_NAME, FUNCTION] = useState(VARIABLE_TYPE). There are two different types of varible states: let and const. 
+
+  const: variable is read only. The variable can not be changed.
+  let: variable is changeable. 
+
+  You put these variable states before anytime you create a new variable.
+  
+  think of a certain search query as a state, for example "romance," which can change when the user decides to look up "action" instead
+  to handle this. We uses states in react rather than static variables
+  */
+
   // State to store the user input genre
   let [genreInput, setGenreInput] = useState(""); 
   // State to store the selected genre from the dropdown
@@ -15,7 +38,10 @@ const Home = () => {
 
   // Function to handle changes in the genre input field
   const handleGenreInputChange = async (event) => {
-    setGenreInput(event.target.value); // Update the genreInput state with the value entered by the user
+    setGenreInput(event.target.value); 
+    /*
+    event.target.value is something found within inspecting the website and console.log
+    */
 
     try {
       // Fetch genre options from TMDB API based on the user input
@@ -42,26 +68,26 @@ const Home = () => {
       let moviesResponse = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=bb76d810eac6dda796c6389702e136b2&language=en-US&sort_by=popularity.desc&page=1&with_keywords=${genreId}`);
       
       // Create an array to store the movie cards
-      let tempMovieCards = [];
+      let  tempMovieCards = [];
       // Loop to create 5 different movie cards
       for (let i = 0; i < 5; i++) {
         let movie = moviesResponse.data.results[i];
         if (!movie) throw new Error("Movie data is undefined"); // Throw an error if movie data is undefined
         
         // Extract movie details from the API response
-        let title = movie.title;
-        let image = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
-        let overview = movie.overview;
-        let voterAverage = movie.vote_average;
-        let releaseDate = movie.release_date;
+        let movietitle = movie.title;
+        let movieimage = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+        let movieoverview = movie.overview;
+        let movievoterAverage = movie.vote_average;
+        let moviereleaseDate = movie.release_date;
 
         // Add movie details to the temporary array
         tempMovieCards.push({
-          title: title,
-          image: image,
-          overview: overview,
-          voterAverage: voterAverage,
-          releaseDate: releaseDate
+          title: movietitle,
+          image: movieimage,
+          overview: movieoverview,
+          voterAverage: movievoterAverage,
+          releaseDate: moviereleaseDate
         });
       }
 
