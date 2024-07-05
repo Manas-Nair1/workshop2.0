@@ -25,16 +25,7 @@ const Home = () => {
   to handle this. We uses states in react rather than static variables
   */
 
-  // State to store the user input genre
-  let [genreInput, setGenreInput] = useState(""); 
-  // State to store the selected genre from the dropdown
-  let [selectedGenre, setSelectedGenre] = useState(""); 
-  // State to store the list of movie cards
-  let [movieCards, setMovieCards] = useState([]); 
-  // State to store genre options for the dropdown
-  let [dropdownOptions, setDropdownOptions] = useState([]); 
-  // State to store any error message
-  let [errorMessage, setErrorMessage] = useState(""); 
+//ENTER STATES HERE
 
   // Function to handle changes in the genre input field
   const handleGenreInputChange = async (event) => {
@@ -50,14 +41,7 @@ const Home = () => {
     Here, I am setting my setGenreInput state. This updates the variable genreInput.
     */
 
-    try {
-      // Fetch genre options from TMDB API based on the user input
-      let response = await axios.get(`https://api.themoviedb.org/3/search/keyword?api_key=bb76d810eac6dda796c6389702e136b2&query=${event.target.value}`);
-      let options = response.data.results.map(result => result.name); // Extract genre names from the API response
-      setDropdownOptions(options); // This updates the dropdownOptions variable.
-    } catch (err) {
-      setErrorMessage("Error fetching genre options"); // Set error message if the API request fails
-    }
+//ENTER TRY AND CATCH HERE
   };
 
   // Function to create movie cards based on the selected genre
@@ -81,26 +65,7 @@ const Home = () => {
       // Create an array to store the movie cards
       let  tempMovieCards = [];
       // Loop to create 5 different movie cards
-      for (let i = 0; i < 5; i++) {
-        let movie = moviesResponse.data.results[i];
-        if (!movie) throw new Error("Movie data is undefined"); // Throw an error if movie data is undefined
-        
-        // Extract movie details from the API response
-        let movietitle = movie.title;
-        let movieimage = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
-        let movieoverview = movie.overview;
-        let movievoterAverage = movie.vote_average;
-        let moviereleaseDate = movie.release_date;
-
-        // Add movie details to the temporary array
-        tempMovieCards.push({
-          title: movietitle,
-          image: movieimage,
-          overview: movieoverview,
-          voterAverage: movievoterAverage,
-          releaseDate: moviereleaseDate
-        });
-      }
+      //ENTER FOR LOOP HERE
 
       // Update the movieCards state with the temporary array
       setMovieCards(tempMovieCards);
@@ -136,24 +101,8 @@ const Home = () => {
       {/* Display error message if any */}
       {errorMessage && <div className="error">{errorMessage}</div>}
 
-      {/* Container to display movie cards */}
-      <div className="container">
-        {movieCards.map((movie, index) => ( // Loop through the movieCards and render movie cards
-          <div key={index} className="card">
-            <div className="rectangle">
-              <div className="square">
-                <img src={movie.image} alt={movie.title} /> {/* Display movie poster */}
-              </div>
-            </div>
-            <div className="details">
-              <h2>{movie.title}</h2> {/* Display movie title */}
-              <p>{movie.releaseDate}</p> {/* Display movie release date */}
-              <p>{movie.overview}</p> {/* Display movie overview */}
-              <p>{movie.voterAverage}</p> {/* Display movie voter average */}
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* ENTER CONTAINER TO DISPLAY MOVIE CARDS HERE */}
+
     </div>
   );
 };
