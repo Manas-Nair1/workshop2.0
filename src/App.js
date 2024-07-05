@@ -38,16 +38,23 @@ const Home = () => {
 
   // Function to handle changes in the genre input field
   const handleGenreInputChange = async (event) => {
+    /*
+    console.log() is what is done in order to troubleshoot. 
+    Troubleshooting is when you test your product step-by-step to see where you may be getting errors from.
+    Here, I am console.log() event so that I can see what the result is of this variable.
+    Within the video, you can see that event variable holds what my text input is on the search bar.
+    */
+    //console.log(event)
     setGenreInput(event.target.value); 
     /*
-    event.target.value is something found within inspecting the website and console.log
+    Here, I am setting my setGenreInput state. This updates the variable genreInput.
     */
 
     try {
       // Fetch genre options from TMDB API based on the user input
       let response = await axios.get(`https://api.themoviedb.org/3/search/keyword?api_key=bb76d810eac6dda796c6389702e136b2&query=${event.target.value}`);
       let options = response.data.results.map(result => result.name); // Extract genre names from the API response
-      setDropdownOptions(options); // Update the dropdownOptions state
+      setDropdownOptions(options); // This updates the dropdownOptions variable.
     } catch (err) {
       setErrorMessage("Error fetching genre options"); // Set error message if the API request fails
     }
@@ -55,13 +62,17 @@ const Home = () => {
 
   // Function to create movie cards based on the selected genre
   const createMovieCards = async (selectedGenre) => {
-    setSelectedGenre(selectedGenre); // Update the selectedGenre state
+    setSelectedGenre(selectedGenre); // Update the selectedGenre variable state
     if (!selectedGenre) return; // If no genre is selected, exit the function
     setErrorMessage(""); // Reset any previous error messages
 
     try {
       // Fetch genre ID from TMDB API based on the selected genre
       let genreResponse = await axios.get(`https://api.themoviedb.org/3/search/keyword?api_key=bb76d810eac6dda796c6389702e136b2&query=${selectedGenre}`);
+      //console.log(genreResponse)
+      /*
+      There is a video demonstration on how we got the genreId.
+      */
       let genreId = genreResponse.data.results[0].id;
 
       // Fetch movies from TMDB API based on the genre ID
