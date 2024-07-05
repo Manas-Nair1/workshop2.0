@@ -3,26 +3,19 @@ import axios from 'axios';
 
 const Home = () => {
 
-//ENTER STATES HERE
+//STEP 1: ENTER STATES HERE. THERE ARE 5 in total. Each step will go into creating all 5 states.
 
   // Function to handle changes in the genre input field
   const handleGenreInputChange = async (event) => {
-//ENTER setGenreInput HERE
+//STEP 2: ENTER PROCEDURE FOR genreInput variable. THIS CONTAINS CONSOLE.LOG APPROACH.
 
-//ENTER TRY AND CATCH HERE
+//STEP 3: ENTER PROCEDURE FOR dropdownOptions variable. THIS CONTAINS API REQUEST APPROACH.
   };
 
-  // Function to create movie cards based on the selected genre
   const createMovieCards = async (selectedGenre) => {
-   //ENTER IF STATEMENT FOR SETSELECTEDGENRE HERE
-
-    try {
-      //ENTER GENRE ID VARIABLE HERE
-      //ENTER tempMovieCards VARIABLE HERE
-
-    } catch (err) {
-
-    }
+   //STEP 4: ENTER PROCEDURE FOR selectedGenre variable. THIS CONTAINS FOR LOOP APPROACH.
+   //STEP 5: ENTER PROCEDURE FOR errorMessage variable.
+   //STEP 6: ENTER PROCEDURE FOR movieCard variable. 
   };
 
   // Wrapper function to pass selected value to createMovieCards
@@ -32,7 +25,6 @@ const Home = () => {
 
   return (
     <div>
-      {/* Input field for entering genre */}
       <input
         type="text"
         placeholder="Enter genre"
@@ -47,12 +39,26 @@ const Home = () => {
           <option key={option} value={option}>{option}</option> // Render options dynamically based on available genre options
         ))}
       </select>
-
       {/* Display error message if any */}
       {errorMessage && <div className="error">{errorMessage}</div>}
-
-      {/* ENTER CONTAINER TO DISPLAY MOVIE CARDS HERE */}
-
+        {/* Container to display movie cards */}
+        <div className="container">
+          {movieCards.map((movie, index) => ( // Loop through the movieCards and render movie cards
+            <div key={index} className="card">
+              <div className="rectangle">
+                <div className="square">
+                  <img src={movie.image} alt={movie.title} /> {/* Display movie poster */}
+                </div>
+              </div>
+              <div className="details">
+                <h2>{movie.title}</h2> {/* Display movie title */}
+                <p>{movie.releaseDate}</p> {/* Display movie release date */}
+                <p>{movie.overview}</p> {/* Display movie overview */}
+                <p>{movie.voterAverage}</p> {/* Display movie voter average */}
+              </div>
+            </div>
+          ))}
+        </div>
     </div>
   );
 };
